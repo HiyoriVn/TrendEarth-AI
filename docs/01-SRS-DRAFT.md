@@ -1,206 +1,144 @@
-# TrendEarth AI — Software Requirements Specification (SRS)
+# TrendEarth AI — Software Requirements Specification
 
-**Version:** 0.9 — CANDIDATE FOR TECHNICAL-LEAD REVIEW  
-**Status:** NOT APPROVED / NOT IMPLEMENTED  
-**Target:** NASA Space Apps Challenge 2026 — *Be An Earth System Trend Detective!*  
-**Document owner:** Technical Lead  
-**Scope:** Hackathon MVP, three-person human team  
-**Canonical issue:** [#1 Requirements approval](https://github.com/HiyoriVn/TrendEarth-AI/issues/1)
+**Version:** 1.0 proposal  
+**Approval:** Pending Technical Lead review; **NO-GO for implementation pending evidence and sign-off**  
+**Scope:** Hackathon MVP; documentation proposal only
 
-> The specifications below are proposed decisions, not verified claims of implementation, NASA data availability, scientific results or organizer approval. Freeze the scope after reviewing the four decisions in §13. Complete the MVP before expanding features.
+This proposal reconciles the workspace SRS draft with the SRS candidate in PR #4 (`docs/srs-v1-review`) and incorporates the Data Researcher, UX Architect, and Science QA reviews. It resolves the four review blockers as explicit requirements and an evidence-based status: NASA response verification remains UNVERIFIED because both live requests failed before returning an HTTP response. The 30-year rule below is a conservative TrendEarth reporting policy, not a universal statistical requirement. This document does not authorize implementation. Technical Lead approval and the release blockers in §9 are required before design/build.
 
-## 1. Purpose and problem
+## 1. Problem and objective
 
-Earth science data are available but difficult for non-specialists to retrieve, aggregate and interpret. TrendEarth AI will present **real NASA-derived historical data** for selected grid locations and help a user answer: what variable changed, where, in which direction, by how much, and what statistical evidence supports a linear trend.
+Help a student or teacher explore a NASA Earth-system time series and understand what is changing, where, by how much, and what the statistical result does and does not establish. The MVP presents annual near-surface air temperature for two fixed grid points, with a reproducible trend calculation and visible source and limitations.
 
-**Product promise:** "Discover the change. Understand the evidence."
+“TrendEarth AI” is the project name. The MVP does not use or claim an AI model.
 
-"AI" is a project name. An MVP using ordinary least squares (OLS) and deterministic explanations **must not claim to run machine learning, forecasting or an LLM**.
+## 2. Users and primary scenario
 
-## 2. Stakeholders and responsibilities
+The primary user is a student or teacher with no assumed climate-data or statistics expertise. They select Hanoi or Can Tho, inspect the annual temperature series and trend, and read the result with its statistical assumptions and spatial limitations. No user interviews or user research are claimed.
 
-| Role | Responsibility |
-| --- | --- |
-| Technical Lead + Visual Design (human) | SRS approval, architecture, scientific/visual signoff, integration and release |
-| Slides + Presenter (human) | Storyboard, pitch, speech, attribution and submission coordination |
-| Third teammate (human, allocation TBD) | Task support assigned by the Technical Lead; do not assume specialized expertise |
-| Coding/research agents (if supported) | Bounded contributions with human validation; no autonomous merge or scientific claims |
+## 3. Fixed MVP scope
 
-Primary intended user: an undergraduate student or teacher exploring historical temperature changes. No claim of user interviews or observed market demand is made.
+| Item | Proposed v1 scope |
+|---|---|
+| Source | NASA POWER Monthly Point API; retain and cite exact request and response metadata |
+| Variable | `T2M`, air temperature at 2 m; verify returned unit metadata before processing/display |
+| Sites | Hanoi requested point (21.03, 105.85); Can Tho requested point (10.03, 105.78) |
+| Period | 1991–2024 inclusive, subject to response validation |
+| Annual series | Day-weighted mean from monthly values; an included year requires 12 valid months |
+| Reporting threshold | Report the fitted trend and its p-value only when at least 30 of the 34 annual values are complete; conservative product rule, not a universal statistical requirement |
+| Analysis | Ordinary least-squares linear trend; slope displayed in °C/decade; two-sided test of zero slope, labelled exploratory |
+| Delivery | Static, responsive frontend with precomputed, provenance-bearing JSON; no secrets or paid services |
 
-## 3. Objectives, success and non-goals
+Coordinates above identify requested points. The UI and metadata must also report the actual NASA grid coordinates when provided by the response. Results describe the selected NASA POWER grid cell, not a city or weather station.
 
-### 3.1 P0 measurable outcome
+## 4. Functional requirements
 
-A working one-page desktop/mobile website that loads **precomputed JSON derived from NASA POWER T2M** for a representative point near Hanoi and a representative point near Can Tho, allows switching between them, plots the **annual mean** series and OLS trend, states the slope in **°C/decade**, and presents the p-value with an explicit assumptions caveat and reproducible source link.
+| ID | Priority | Requirement | Acceptance evidence |
+|---|---|---|---|
+| FR-01 | P0 | Offer Hanoi and Can Tho in a clearly labelled location selector. T2M and 1991–2024 remain visibly identified as fixed scope. | Selecting either site updates its label, chart, statistics, coordinates, and provenance together. |
+| FR-02 | P0 | Present only validated NASA POWER monthly T2M data aggregated to annual values for 1991–2024. | Each included year has 12 valid monthly inputs. Show valid-year count, covered years, and exclusions; never imply 34 complete years unless all 34 validate. |
+| FR-03 | P0 | Show annual observations and a fitted linear trend on a chart. | Year and temperature axes include labels and units; legend and non-color-only line distinction are available; fitted values align with the corresponding years. |
+| FR-04 | P0 | Compute the OLS slope and display `10 × slope` in °C/decade. | Numerical unit checks against controlled synthetic fixtures verify slope, decade conversion, and fitted values within a stated tolerance. |
+| FR-05 | P0 | Show valid annual sample size and a two-sided p-value for the OLS zero-slope test only when at least 30 complete annual values are available. | The 30-of-34 threshold is an explicit conservative product reporting rule, not a universal statistical requirement. Below 30, show valid observations and exclusions but suppress the fitted trend, slope, and p-value with an explanation. At or above 30, identify the classical OLS p-value as exploratory and conditional on assumptions; do not imply causation or practical importance. Guard zero variance. |
+| FR-06 | P0 | Make source and method inspectable on the same page. | Show NASA POWER attribution/link, exact API request URL, access timestamp, requested and returned coordinates, source/product, unit, period, transformation, missing-value policy, valid years, and grid-cell caveat. |
+| FR-07 | P0 | Provide honest loading, ready, incomplete-data, insufficient-data, and local data load/parse failure states. | No mock or placeholder values are presented as observations. Incomplete years are excluded and listed. Below the 30-year product threshold, suppress trend statistics. The static runtime reads bundled JSON; NASA API retrieval failure is a data-preparation state, not a runtime fallback. |
+| FR-08 | P0 | Support keyboard use, mobile and desktop layouts, and readable scientific content. | Selector and source/method details are keyboard reachable; at 360 px viewport there is no horizontal overflow; labels remain legible and significance is not conveyed by color alone. |
+| FR-09 | P1 | Provide a plain-language summary derived only from displayed computed fields. | Summary updates with the selected series and makes no causal, citywide, or policy claims. |
+| FR-10 | P2 | Add other variables or arbitrary coordinates. | Out of MVP; requires a separate scope decision after P0 acceptance. |
 
-### 3.2 P1 only if P0 is fully accepted
+## 5. Data and calculation requirements
 
-Cautious deterministic plain-English interpretation, optional clearer two-location comparison and refined visual motion. No P1 work may risk the submission.
+1. Request monthly `T2M` for each fixed point and 1991–2024 from the NASA POWER Monthly Point API. Record the community/parameter options and returned metadata. Verify the actual response before asserting coverage, units, actual JSON keys, or complete annual values. Current live response status is documented in `docs/11-SRS-V1-REVIEW-EVIDENCE.md` and is UNVERIFIED.
+2. Preserve the raw response used to generate each delivered data file, along with the exact request URL and retrieval timestamp. Cache only real NASA responses. Do not commit credentials or unnecessary large raw files.
+3. Where NASA returns a missing sentinel such as `-999`, treat it as missing, never as a temperature. Require 12 valid monthly records for an annual value. Do not impute or silently fill missing months or years. Exclude incomplete years from regression and disclose them in the UI and metadata.
+4. For each complete year, compute `annual_mean = Σ(monthly_mean × days_in_month) / days_in_year`, using the calendar year and leap-year day counts. Record this transformation. Confirm the source's monthly value semantics and units before using this formula.
+5. Fit OLS to `(calendar year, annual_mean_°C)` pairs. The displayed rate is `10 × slope` in °C/decade. Use the same fitted model for the chart's trend line and reported statistics.
+6. Apply the product reporting gate: show OLS line, slope, and p-value only for `n ≥ 30` complete annual values among the 34 possible years. This threshold is a conservative product choice for this MVP, not a universal statistical criterion or guarantee of valid inference. At `n < 30`, show available observations and exclusions, but suppress those trend outputs.
+7. The reported p-value is the two-sided classical OLS test of a zero slope. Because annual climate observations can be temporally autocorrelated and this MVP does not specify an autocorrelation correction, label the p-value exploratory and state that inference is conditional on model assumptions. Do not describe `p < 0.05` as proof of causation, importance, or certainty.
+8. Describe values as NASA POWER model/reanalysis grid-cell estimates at returned grid coordinates when the response provides them. Do not infer citywide conditions, station measurements, urban heat-island effects, causes, or policy outcomes from this series alone.
 
-### 3.3 Explicit exclusions
+## 6. Proposed data contract
 
-No paid APIs, authentication, database, live API server, LSTM/Transformer, predictive model, interactive geospatial map, free-form coordinates, station-level claims, causal attribution, invented data or AI-generated scientific assertions.
-
-## 4. System boundary and architecture assumptions
-
-- **Research / preparation time:** Python script requests NASA POWER monthly point data, validates metadata and monthly measurements, builds annual means, computes trend and exports JSON deterministically.
-- **Runtime:** Static React/Vite frontend reads local JSON files; NASA API access is **not required** for a demo or during browsing.
-- **Deployment:** A zero-cost static web host (selection pending) and GitHub repository with attribution and reproducibility instructions.
-- **Trust boundary:** Never treat raw NASA JSON as guaranteed valid; validate response, variable, time keys, units, missing sentinels and actual coverage before deriving any output.
-
-## 5. Primary user journeys
-
-### UC-01 — Explore annual temperature at a fixed location
-
-**Actor:** learner. **Precondition:** at least one verified derived JSON dataset is bundled.
-
-1. User opens the site; sees the title, short promise and source label.
-2. User selects **Hanoi (NASA POWER grid point)**.
-3. System shows selected coordinates, data period, annual series, fitted linear line, observed-unit axis labels and a statistical summary.
-4. User sees slope in °C/decade, p-value, sample size, significance *under OLS assumptions* and a caveat that point/grid data do not represent the entire city.
-5. User can access source URL and methodology summary.
-
-**Alternative:** missing/unvalidated data -> explicit unavailable message, not numbers or fake chart.
-
-### UC-02 — Switch locations
-
-User selects **Can Tho (NASA POWER grid point)**. Every chart label, coordinate, numeric result, source URL and explanation updates consistently; no stale fields from the previously selected location.
-
-### UC-03 — Inspect a caveat
-
-User opens/reads a plain-language "About these results" section: data product type, spatial caveat, monthly-to-annual rule, fitted trend assumptions, and warning that significance is not causality.
-
-## 6. Functional requirements
-
-| ID | Priority | Requirement | Acceptance test |
-| --- | --- | --- | --- |
-| FR-01 | P0 | Select between two fixed location labels; show their exact coordinates | Switching changes every location-dependent field; no stale values |
-| FR-02 | P0 | Use only validated NASA POWER monthly T2M source data for 1991–2024 | Every displayed observation maps to a reproducible raw record and computation |
-| FR-03 | P0 | Aggregate 12 monthly mean temperatures to one annual mean, weighting by calendar month length | Synthetic leap/non-leap unit tests match manually calculated annual means |
-| FR-04 | P0 | Exclude and explicitly report any year with missing or invalid months | No missing sentinel, NaN or fabricated zero shown as a measured value |
-| FR-05 | P0 | Plot valid annual values and fitted OLS series as distinct labelled series | X axis year; Y axis °C; fitted line does not appear as measured values |
-| FR-06 | P0 | Show slope in °C/decade, n, p-value and method | Reference numerical test matches within a documented tolerance |
-| FR-07 | P0 | Explain statistical uncertainty and source limitations | No "proved climate cause", "city-wide" or unsupported "AI prediction" language |
-| FR-08 | P0 | Show NASA data provenance: URL, retrieval date, variable, grid-point coordinates, product/dataset when available | Reproducibility information is accessible from the website or linked repo |
-| FR-09 | P0 | Show explicit loading, empty, invalid-data and failed-fetch states | No fabricated fallback; informative accessible error state |
-| FR-10 | P0 | Responsive and keyboard-operable location selector and chart summary | 360px and desktop smoke test; labels and focus visible |
-| FR-11 | P1 | Deterministic plain-English interpretation from precomputed numeric results | Narrative changes correctly by sign and p-value; no hardcoded unsupported claim |
-| FR-12 | P2 | Extra variables, locations, charts or long-term prediction | Deferred, not accepted into hackathon MVP |
-
-## 7. Dataset and scientific processing contract
-
-### 7.1 Proposed NASA requests (MUST VERIFY)
-
-- Hanoi point: latitude 21.03, longitude 105.85.
-- Can Tho point: latitude 10.03, longitude 105.78.
-- Variable: `T2M`; proposed 1991–2024 inclusive; candidate API endpoint `/api/temporal/monthly/point` using `community=SB`.
-- Official documentation: https://power.larc.nasa.gov/docs/services/api/temporal/monthly/
-- Full candidate URLs and scientific checks: [docs/03-SCIENCE-DATA-PROTOCOL.md](03-SCIENCE-DATA-PROTOCOL.md).
-
-**Do not assert** that API coverage, exact response keys, underlying sub-dataset, metadata names, grid resolution or sentinel values are confirmed until an actual response is obtained and recorded in issue #2.
-
-### 7.2 Deterministic ETL rules
-
-1. Validate HTTP success, JSON structure, parameter `T2M`, calendar coverage and Celsius unit from metadata.
-2. Extract **only monthly `YYYYMM` values**, if that is the actual response format; ignore any annual-aggregate fields to avoid double counting.
-3. Reject nulls, non-finite values and source-documented missing markers. Never turn missing values into 0.
-4. Require **all 12 valid months** for each included year; record exclusion and reason for incomplete years.
-5. Calculate annual average of monthly means with **calendar-day weighting**: `sum(T_month * days_in_month) / sum(days_in_month)`, only after verifying API's monthly statistic semantics.
-6. OLS uses `x = year`, `y = annualMean°C`; slope-per-decade = 10 × slope-per-year. At least **3 valid years** are required; otherwise no inferential result.
-7. Report OLS two-sided p-value with a caution that temporal autocorrelation, model assumptions and multiple testing may affect significance. **p < 0.05 is not proof of causation or robust climate attribution**.
-8. All climate numbers rendered in the app must derive from this real pipeline. Test fixtures may be synthetic but cannot be shipped as apparent observations.
-9. Save retrieval timestamp, full source URL, data product metadata, units, valid-year count, excluded years, processing notes and method version.
-
-## 8. Proposed static JSON contract (NOT YET FROZEN)
-
-One file per grid-point, e.g. `frontend/public/data/hanoi.json` and `can-tho.json`. Numeric values below are deliberately `null` placeholders (NOT observations):
+Freeze this contract only after the NASA response has been inspected and the Technical Lead approves the data and method decisions.
 
 ```json
 {
-  "schemaVersion": "1.0-draft",
   "locationId": "hanoi",
-  "label": "Hanoi (NASA POWER grid point)",
-  "coordinates": {"latitude": 21.03, "longitude": 105.85},
+  "label": "Hanoi (NASA POWER grid cell)",
+  "requestedCoordinates": { "latitude": 21.03, "longitude": 105.85 },
+  "returnedGridCoordinates": null,
   "variable": "T2M",
-  "unit": "degC",
-  "period": {"startYear": 1991, "endYear": 2024},
-  "source": {
-    "provider": "NASA POWER",
-    "product": "UNVERIFIED",
-    "url": "UNVERIFIED",
-    "retrievedAt": null
-  },
-  "processing": {
-    "aggregation": "day-weighted complete monthly means",
-    "requiredMonthsPerYear": 12,
-    "version": "UNVERIFIED"
-  },
-  "observations": [],
+  "unit": null,
+  "expectedUnit": "degC; verify against NASA response metadata before use",
+  "startYear": 1991,
+  "endYear": 2024,
+  "validYears": [],
   "excludedYears": [],
+  "completeYearCount": 0,
+  "reportingThresholdYears": 30,
+  "source": "NASA POWER Monthly Point API",
+  "sourceUrl": "<exact request URL>",
+  "accessedAt": "<ISO-8601 timestamp>",
+  "verificationStatus": "UNVERIFIED",
+  "responseMetadata": null,
+  "missingValueMarkersObserved": null,
+  "processing": "Day-weighted mean of 12 valid monthly T2M values; leap-year calendar days used",
+  "missingValuePolicy": "Treat documented sentinel values as missing; exclude years without 12 valid months",
+  "observations": [],
   "trend": {
-    "method": "OLS",
-    "n": null,
     "slopePerYear": null,
     "slopePerDecade": null,
-    "intercept": null,
-    "pValue": null,
-    "rSquared": null
+    "pValueTwoSided": null,
+    "validYearCount": null,
+    "reportingStatus": "suppressed until at least 30 complete years",
+    "method": "OLS; classical p-value is exploratory"
   }
 }
 ```
 
-The actual production JSON must replace every unknown with either verified content or an explicit documented unavailability state; no fictitious measurement or statistical number may be present. Data and UI agents must agree on this schema before coding.
+`null` values above are schema placeholders, not measurements. The example is not an observed NASA response and must not be used as a production dataset. The final schema must preserve requested coordinates separately from returned grid coordinates and include the actual response structure or an explicit UNVERIFIED state.
 
-## 9. UI and accessibility requirements
-
-- **One-screen-first layout:** short problem statement; two-location control; summary cards for °C/decade, p-value and n; annual chart; methods/source/caveat disclosure.
-- All chart series, axes, units and fit/observed distinction are visible without relying solely on color.
-- Small-screen baseline: 360px viewport, no horizontal page overflow, readable annotation and legible source links.
-- User can navigate selectors and details using keyboard; semantic labels and visible focus.
-- Four explicit view states: **ready**, **loading**, **no/insufficient valid data**, **load/parse failure**.
-- Public interface language English; internal project documents may be Vietnamese.
-- Design brief and signoff in [docs/04-DESIGN-BRIEF.md](04-DESIGN-BRIEF.md).
-
-## 10. Non-functional requirements and quality gates
+## 7. Nonfunctional requirements
 
 | ID | Requirement | Verification |
-| --- | --- | --- |
-| NFR-01 | Zero-cost deployable static app; no secret or backend required in demo | Local production build and deployed URL smoke test |
-| NFR-02 | Numerical reproducibility from stored raw NASA response or documented retrieval procedure | Re-running ETL on identical input yields identical observations/statistics, except non-semantic timestamps |
-| NFR-03 | Robust input/error handling; do not silently substitute mock climate records | Invalid/incomplete fixture tests; UI failure path |
-| NFR-04 | Mobile/desktop readability and keyboard accessibility | 360px + desktop smoke checks |
-| NFR-05 | Legal/scientific attribution, provenance and no unsupported claims | README/UI/pitch review |
-| NFR-06 | No unused large dependencies, credentials or privileged deployment by agents | Dependency audit, git status, release gate |
+|---|---|---|
+| NFR-01 | Static frontend; no secrets or paid runtime services. | Production build and host run without a backend. |
+| NFR-02 | Deterministic, reproducible processing. | Same validated raw inputs and configuration produce identical derived JSON. |
+| NFR-03 | Accessible and responsive. | Keyboard, contrast/readability, and 360 px viewport checks. |
+| NFR-04 | Scientific integrity and traceable provenance. | Every displayed result traces to sourced input and documented processing; no fabricated observations or claims. |
+| NFR-05 | Repository includes license, source attribution, and reproducibility instructions. | Repository review. |
+| NFR-06 | Product and pitch do not imply AI model functionality or NASA endorsement. | UI, README, and pitch copy review. |
 
-## 11. Verification matrix
+## 8. Verification and definition of done
 
-| Test | Verifies | Evidence to retain |
-| --- | --- | --- |
-| T-01 | T2M source metadata, monthly keys and range | Raw NASA response excerpt, URL and retrieval time |
-| T-02 | Day-weighted annual mean and leap-year handling | Controlled numeric unit tests |
-| T-03 | Missing/invalid months excluded and reported | Missing-value and sentinel fixtures |
-| T-04 | OLS slope ×10, p-value, n and fitted line | Reference scientific test |
-| T-05 | Location switch consistency | Manual/browser integration test |
-| T-06 | Offline/static dataset availability and explicit error states | Browser smoke result |
-| T-07 | Responsive 360px, desktop, keyboard and units | Screenshot/checklist |
-| T-08 | Deployed link, GitHub reproducibility and pitch claim consistency | Release checklist + submission proof |
+Before release, verify both live NASA responses or explicitly mark the endpoint unverified and do not ship unverified values. Retain source metadata and evidence for each series. Automated numerical checks must use synthetic fixtures only and cover: missing sentinel handling, incomplete-year exclusion, day-weighting including leap years, known OLS slope and decade conversion, year/value alignment, p-value behavior against a controlled reference, insufficient-sample handling, and zero-variance handling. Synthetic values must never be presented as scientific results.
 
-A test is **NOT PASSED** until it has actually been run and its output inspected.
+The MVP is complete when the P0 requirements are met, a user can switch sites and inspect a traceable result, science and UX acceptance checks pass, the static build is demonstrable on mobile and desktop, NASA attribution is present, and required submission links and backup media are verified.
 
-## 12. Release and submission
+## 9. Technical Lead approval decisions and remaining blockers
 
-- Mandatory: stable site, verified real data or transparent reduced-scope failure disclosure, reproducibility README, science/source attribution, test evidence, backup screenshots/video, pitch and all required submission URLs.
-- No deployment/publication without Technical Lead approval, per `AGENTS.md`.
-- Local judging time should be rechecked against organizer announcements; conservative internal release freeze should be before 11:00 ICT on 2026-11-15.
-- If live data ingestion fails, cut locations/years rather than fabricate or misrepresent observations. If no defensible data can be obtained, disclose limitation rather than submit made-up science.
+These decisions block the transition from requirements to design/build:
 
-## 13. Four blocking sign-offs
+1. Confirm repository visibility and Apache-2.0 license as proposed in the original project materials.
+2. Approve the two requested coordinates and 1991–2024 period, subject to actual NASA response validation for both sites.
+3. Approve the annual aggregation policy (day-weighted monthly means; all 12 months required), the 30-complete-year reporting threshold as a conservative product rule, and classical OLS p-value labelled exploratory. A different inferential method needs a documented decision and validation plan.
+4. Confirm project spelling as `TrendEarth AI` and confirm the organizer's submission process/deadline requirements.
+5. Approve the UX behavior: location is the sole selector in MVP; variable and date window are fixed; source and methods are available in-page. Partial data and below-threshold data show observations and exclusions but suppress trend outputs.
 
-- [ ] **Identity/licensing:** public repository and Apache-2.0 remain acceptable; entry named "TrendEarth AI".
-- [ ] **Data scope:** two candidate grid points, NASA POWER T2M and 1991–2024, contingent on verified response coverage.
-- [ ] **Science/UI scope:** one-screen OLS trend explorer, p-value with stated caveats; advanced AI deferred.
-- [ ] **Release:** confirm competition submission procedure and conservative local timeline.
+**Blocking evidence gap:** no NASA HTTP response body has been obtained for either requested site. The endpoint, actual response schema, unit, returned coordinates, temporal coverage, and missing-value markers therefore remain UNVERIFIED. Do not approve a data contract as populated or start implementation against assumed response fields until this gap is closed or the Technical Lead explicitly accepts a documented reduced-scope/no-data path.
 
-**Decision log:** [docs/07-DECISIONS-RISKS.md](07-DECISIONS-RISKS.md).  
-**Stage gate:** after the Technical Lead signs off, mark this SRS v1.0 **APPROVED**, then freeze JSON contract/design and begin implementation.
+No implementation, deployment, or publication is authorized by this proposal. After approval, update the approved SRS status and proceed through the documented stage gates.
+
+## 10. Review evidence and source references
+
+The three parallel reviews were read-only and changed no files. NASA documentation supports feasibility in principle, but neither live response nor site coverage was verified. The UX review identified and resolved the selector scope conflict by fixing T2M and the period and retaining one location selector. The Science QA review recommended complete-year rules and qualified OLS inference; this proposal adds the 30-year conservative product reporting threshold. Exact verification attempts and observed failure details are recorded in `docs/11-SRS-V1-REVIEW-EVIDENCE.md`.
+
+- [NASA POWER Monthly API](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/)
+- [NASA POWER temporal processing](https://power.larc.nasa.gov/docs/methodology/data/processing/)
+- [NASA POWER service guidance](https://power.larc.nasa.gov/docs/services/)
+- [NASA POWER API overview](https://power.larc.nasa.gov/docs/services/api/)
+- [NASA POWER parameter dictionary](https://power.larc.nasa.gov/docs/tutorials/parameters/)
+- [NASA POWER API limitations](https://power.larc.nasa.gov/docs/services/api/projection/)
+
+Comparison source: SRS v0.1 in `docs/01-SRS-DRAFT.md` on the base branch and SRS v0.9 candidate in PR #4 on `docs/srs-v1-review`. The candidate's one-screen UX is retained; fixed-scope selectors, coordinate provenance, partial-data behavior, and the 30-year reporting gate are made explicit here.
+
