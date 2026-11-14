@@ -94,7 +94,7 @@ User opens/reads a plain-language "About these results" section: data product ty
 
 - Hanoi point: latitude 21.03, longitude 105.85.
 - Can Tho point: latitude 10.03, longitude 105.78.
-- Variable: \`T2M\`; proposed 1991–2024 inclusive; candidate API endpoint \`/api/temporal/monthly/point\` using \`community=SB\`.
+- Variable: `T2M`; proposed 1991–2024 inclusive; candidate API endpoint `/api/temporal/monthly/point` using `community=SB`.
 - Official documentation: https://power.larc.nasa.gov/docs/services/api/temporal/monthly/
 - Full candidate URLs and scientific checks: [docs/03-SCIENCE-DATA-PROTOCOL.md](03-SCIENCE-DATA-PROTOCOL.md).
 
@@ -102,21 +102,21 @@ User opens/reads a plain-language "About these results" section: data product ty
 
 ### 7.2 Deterministic ETL rules
 
-1. Validate HTTP success, JSON structure, parameter \`T2M\`, calendar coverage and Celsius unit from metadata.
-2. Extract **only monthly \`YYYYMM\` values**, if that is the actual response format; ignore any annual-aggregate fields to avoid double counting.
+1. Validate HTTP success, JSON structure, parameter `T2M`, calendar coverage and Celsius unit from metadata.
+2. Extract **only monthly `YYYYMM` values**, if that is the actual response format; ignore any annual-aggregate fields to avoid double counting.
 3. Reject nulls, non-finite values and source-documented missing markers. Never turn missing values into 0.
 4. Require **all 12 valid months** for each included year; record exclusion and reason for incomplete years.
-5. Calculate annual average of monthly means with **calendar-day weighting**: \`sum(T_month * days_in_month) / sum(days_in_month)\`, only after verifying API's monthly statistic semantics.
-6. OLS uses \`x = year\`, \`y = annualMean°C\`; slope-per-decade = 10 × slope-per-year. At least **3 valid years** are required; otherwise no inferential result.
+5. Calculate annual average of monthly means with **calendar-day weighting**: `sum(T_month * days_in_month) / sum(days_in_month)`, only after verifying API's monthly statistic semantics.
+6. OLS uses `x = year`, `y = annualMean°C`; slope-per-decade = 10 × slope-per-year. At least **3 valid years** are required; otherwise no inferential result.
 7. Report OLS two-sided p-value with a caution that temporal autocorrelation, model assumptions and multiple testing may affect significance. **p < 0.05 is not proof of causation or robust climate attribution**.
 8. All climate numbers rendered in the app must derive from this real pipeline. Test fixtures may be synthetic but cannot be shipped as apparent observations.
 9. Save retrieval timestamp, full source URL, data product metadata, units, valid-year count, excluded years, processing notes and method version.
 
 ## 8. Proposed static JSON contract (NOT YET FROZEN)
 
-One file per grid-point, e.g. \`frontend/public/data/hanoi.json\` and \`can-tho.json\`. Numeric values below are deliberately \`null\` placeholders (NOT observations):
+One file per grid-point, e.g. `frontend/public/data/hanoi.json` and `can-tho.json`. Numeric values below are deliberately `null` placeholders (NOT observations):
 
-\`\`\`json
+```json
 {
   "schemaVersion": "1.0-draft",
   "locationId": "hanoi",
@@ -148,7 +148,7 @@ One file per grid-point, e.g. \`frontend/public/data/hanoi.json\` and \`can-tho.
     "rSquared": null
   }
 }
-\`\`\`
+```
 
 The actual production JSON must replace every unknown with either verified content or an explicit documented unavailability state; no fictitious measurement or statistical number may be present. Data and UI agents must agree on this schema before coding.
 
@@ -191,7 +191,7 @@ A test is **NOT PASSED** until it has actually been run and its output inspected
 ## 12. Release and submission
 
 - Mandatory: stable site, verified real data or transparent reduced-scope failure disclosure, reproducibility README, science/source attribution, test evidence, backup screenshots/video, pitch and all required submission URLs.
-- No deployment/publication without Technical Lead approval, per \`AGENTS.md\`.
+- No deployment/publication without Technical Lead approval, per `AGENTS.md`.
 - Local judging time should be rechecked against organizer announcements; conservative internal release freeze should be before 11:00 ICT on 2026-11-15.
 - If live data ingestion fails, cut locations/years rather than fabricate or misrepresent observations. If no defensible data can be obtained, disclose limitation rather than submit made-up science.
 
