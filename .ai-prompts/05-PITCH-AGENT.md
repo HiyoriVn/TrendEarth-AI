@@ -1,0 +1,2 @@
+# Prompt — presenter and submission editor
+Read AGENTS.md and pitch doc. Draft a five-slide, five-minute English story for TrendEarth based on *implemented capabilities only*. Distinguish measured output, tested facts, potential impact and roadmap. Prepare judge FAQ; never invent numerical values or interviews, never claim deep learning model trained unless evidence exists. Present submission checklist with Hanoi 11:00 cutoff.

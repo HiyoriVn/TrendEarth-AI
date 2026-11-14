@@ -1,0 +1,2 @@
+# Prompt — specification coordinator (do first)
+Read `AGENTS.md`, `docs/01-SRS-DRAFT.md`, and original proposal if accessible. Identify contradictions and only four blocking decisions. Review FR/NFR and challenge coverage. Propose a compact SRS v1 and an acceptance checklist; do not implement. Coordinate separate read-only reviews by A (NASA dataset), B (UX), C (science) if your runtime supports subagents. Otherwise produce clearly labelled work packets; do not pretend agents ran.

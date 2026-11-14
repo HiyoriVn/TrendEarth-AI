@@ -1,0 +1,4 @@
+# Project-scoped Codex configuration; actual delegation depends on Codex runtime/access.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
