@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import sys
 from datetime import datetime, timezone
@@ -68,7 +69,7 @@ def _record_response(site: str, timeout_seconds: float) -> tuple[dict[str, Any],
             "errorType": type(exc).__name__,
             "errorMessage": str(exc),
         })
-        return record, None
+        return record, body
     except (URLError, TimeoutError, OSError) as exc:
         record.update({
             "status": "FETCH_FAILED",
@@ -148,14 +149,14 @@ def _atomic_write_json(path: Path, value: Any) -> None:
 
 
 def fetch_all(raw_dir: Path, timeout_seconds: float = 30.0) -> tuple[dict[str, Any], int]:
-    if timeout_seconds <= 0:
-        raise ValueError("Timeout must be positive")
+    if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+        raise ValueError("Timeout must be a finite positive number")
     results: list[dict[str, Any]] = []
     bodies: dict[str, bytes] = {}
     for site in SITES:
         record, body = _record_response(site, timeout_seconds)
         results.append(record)
-        if body is not None and record["status"] in {"RAW_RECEIVED_NOT_VALIDATED", "RAW_RECEIVED_INVALID_JSON"}:
+        if body is not None:
             bodies[site] = body
 
     summary = {

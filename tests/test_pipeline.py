@@ -67,6 +67,11 @@ class RegressionPolicyTests(unittest.TestCase):
         observations = [{"year": year, "value": float(year)} for year in range(1991, 2021)]
         self.assertEqual(ols_summary(observations)["reportingStatus"], "REPORTED_EXPLORATORY")
 
+    def test_product_threshold_cannot_be_overridden(self):
+        observations = [{"year": year, "value": float(year)} for year in range(1991, 2021)]
+        with self.assertRaises(TypeError):
+            ols_summary(observations, threshold=2)
+
     def test_zero_variance_suppresses_fit(self):
         observations = [{"year": year, "value": 23.0} for year in range(1991, 2025)]
         fit = ols_summary(observations)
@@ -116,6 +121,17 @@ class ProvenanceValidationTests(unittest.TestCase):
         self.assertIsNone(record["httpStatus"])
         self.assertIsNone(captured)
         self.assertIn("offline", record["errorMessage"])
+
+    def test_http_error_body_is_retained_as_failure_evidence(self):
+        from email.message import Message
+        from urllib.error import HTTPError
+
+        error = HTTPError(request_url("hanoi"), 503, "unavailable", Message(), io.BytesIO(b"service down"))
+        with patch("fetch_power.urlopen", side_effect=error):
+            record, captured = _record_response("hanoi", 1)
+        self.assertEqual(record["status"], "HTTP_ERROR")
+        self.assertEqual(record["httpStatus"], 503)
+        self.assertEqual(captured, b"service down")
 
     def test_request_urls_are_site_specific_nasa_monthly_requests(self):
         for site, coords in SITES.items():

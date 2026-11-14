@@ -116,11 +116,9 @@ def annual_observations(monthly: dict[str, Any], fill_value: float,
     return observations, excluded
 
 
-def ols_summary(observations: list[dict[str, Any]],
-                threshold: int = REPORTING_THRESHOLD_YEARS) -> dict[str, Any]:
+def ols_summary(observations: list[dict[str, Any]]) -> dict[str, Any]:
     """Fit OLS only when the MVP's explicitly conservative reporting gate is met."""
-    if isinstance(threshold, bool) or not isinstance(threshold, int) or threshold < 2:
-        raise ValueError("Reporting threshold must be an integer of at least 2")
+    threshold = REPORTING_THRESHOLD_YEARS
     n = len(observations)
     result: dict[str, Any] = {
         "method": "OLS; two-sided classical p-value is exploratory",
