@@ -86,11 +86,11 @@ def _record_response(site: str, timeout_seconds: float) -> tuple[dict[str, Any],
     if status != 200:
         record["status"] = "HTTP_ERROR"
         record["errorMessage"] = f"NASA POWER returned HTTP {status}"
-        return record, None
+        return record, body
     if content_type != "application/json":
         record["status"] = "RAW_RECEIVED_NON_JSON"
         record["errorMessage"] = f"Expected application/json, received {content_type}"
-        return record, None
+        return record, body
     try:
         payload = json.loads(body)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:

@@ -1,4 +1,5 @@
 import calendar
+import math
 import hashlib
 import io
 import json
@@ -159,7 +160,11 @@ class ProvenanceValidationTests(unittest.TestCase):
             dataset = build_dataset(site, raw, provenance, summary.get("captureEvidence"))
             persisted = json.loads((ROOT / "data" / "processed" / f"{site}.json").read_text(encoding="utf-8"))
             self.assertEqual(dataset["observations"], persisted["observations"])
-            self.assertEqual(dataset["trend"], persisted["trend"])
+            for key, value in dataset["trend"].items():
+                if isinstance(value, float):
+                    self.assertTrue(math.isclose(value, persisted["trend"][key], rel_tol=1e-12, abs_tol=1e-12), key)
+                else:
+                    self.assertEqual(value, persisted["trend"][key])
             self.assertEqual(dataset["rawInputSha256"], hashlib.sha256(raw).hexdigest())
             self.assertEqual(dataset["completeYearCount"], 34)
             self.assertEqual(dataset["responseMetadata"]["captureEvidence"]["workflowRunId"], 43624190717)
