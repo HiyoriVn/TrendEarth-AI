@@ -1,47 +1,28 @@
-# MVP integration QA
+# Climate Explorer verification — Issue #12
 
-Executed in the integration workspace:
+Executed locally on Windows:
+- Python unittest: 16 tests passed after restoring exact committed raw bytes.
+- Frontend unit suite: 26 passed, 0 failed (15 existing + 11 new).
+- Production build: passed, 28 modules, final component-oriented CSS.
+- NASA raw hashes match after byte-preserving checkout; .gitattributes prevents
+  Windows line-ending conversion for raw/processed/static dataset assets.
 
-- `python -m unittest discover -s tests -v`: 16 tests passed (root integration run).
-- `node --test frontend/tests/data.test.mjs`: 15 tests passed, 0 failed.
-- Contract checks cover both unchanged NASA datasets, finite observations/fit,
-  location/unit identity, year order and counts, 30-year policy, missing-data and
-  suppressed-fit behavior. Numerical pipeline tests independently check annual
-  aggregation and OLS against the cached responses.
+New numerical tests cover complete30-year baseline and zero-mean anomalies,
+missing baselines, trailing5 contiguous windows, gap handling, aligned inspection,
+CSV raw values/provenance/exclusions and escaping. Synthetic fixtures stay in tests.
 
-## Browser verification limitation
+Four Playwright browser tests were added for controls, comparison, modes, inspector,
+CSV download, missing/invalid responses, keyboard selection and1440/360px layouts.
+Local Edge exited during launch (browserType.launch: Target page, context or browser
+has been closed; temporary profile/Crashpad errors). Tests failed before page creation;
+no browser interaction/rendered layout approval or screenshots are claimed.
+CI installs Chromium and reruns these checks; inspect its results before release.
 
-Actual Playwright launch was attempted with installed system Chromium. The
-browser terminated before page creation:
-`FATAL:chrome/browser/process_singleton_posix.cc:297 ... socket() failed: Operation not permitted (1)`
-followed by SIGABRT. Retrying direct Chromium with no-zygote/single-process flags
-produced the same error. No browser screenshots, rendered responsive checks,
-keyboard walkthrough or browser end-to-end pass are claimed.
+Scientific invariants: canonical datasets and Python algorithms unchanged; full-window
+OLS metrics kept separate from descriptive transforms; no regression on transformed
+series. Baseline requires every annual year1991–2020. Moving windows trail by4years
+and never bridge gaps. CSV always exports raw annual values with per-site metadata.
 
-## Technical Lead release checks
-
-- Confirm automatic Python and frontend CI are green on the final PR head.
-- Open the production build locally; at 360px and desktop widths confirm no
-  horizontal page overflow and readable chart labels.
-- Use keyboard only to change location and open source/method details.
-- Switch Hanoi/Can Tho; chart, statistics, label and provenance must update
-  together. Confirm no stale data flashes while loading.
-- Check missing JSON, malformed JSON and below-threshold data states; fit outputs
-  must remain hidden when suppressed, while observations/exclusions stay visible.
-- Review NASA attribution, requested versus returned geometry and exploratory
-  p-value/autocorrelation caveat. Approve deployment separately.
-
-## Static accessibility/science inspection
-
-The source provides a labelled native location selector, visible keyboard focus,
-a skip link, SVG title/description, accessible annual-value table, live loading
-announcements, alert errors and keyboard-operable native disclosure elements.
-The fit is dashed as well as a different color. Annual observation paths split
-at excluded years. Chart fit values use the supplied intercept and annual slope;
-statistics use the supplied scientific outputs. Layout source includes mobile
-breakpoints. These source checks do not substitute for rendered browser QA.
-
-Final integration run: Vite 6.4.6 production build passed (25 modules).
-A local Vite preview smoke served `/`, `/data/hanoi.json` and
-`/data/can-tho.json` with HTTP 200. Both JSON responses matched canonical
-processed inputs byte for byte. `git diff --check` passed.
+Manual release checks: compare all modes, focus/click points, keyboard year selection,
+CSV contents, mobile overflow, missing/invalid sources and below-threshold data.
+No merge or deployment was performed.

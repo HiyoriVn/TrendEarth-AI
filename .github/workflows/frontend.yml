@@ -16,3 +16,7 @@ jobs:
       - run: npm --prefix frontend test
       - run: npm --prefix frontend run build
       - run: cmp data/processed/hanoi.json frontend/dist/data/hanoi.json && cmp data/processed/can-tho.json frontend/dist/data/can-tho.json
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm --prefix frontend run test:browser
+      - run: npx --yes wrangler@4.162.0 deploy --dry-run --outdir .tmp/workers-check
