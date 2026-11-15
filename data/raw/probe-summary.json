@@ -1,0 +1,172 @@
+{
+  "scope": "diagnostic only; NOT verified climate statistics",
+  "results": [
+    {
+      "site": "hanoi",
+      "requestedCoordinates": {
+        "latitude": 21.03,
+        "longitude": 105.85
+      },
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M&community=SB&longitude=105.85&latitude=21.03&format=JSON&start=1991&end=2024",
+      "accessedAt": "2026-11-14T18:00:50.188224+00:00",
+      "status": "RAW_RECEIVED_NOT_VALIDATED",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "topLevelKeys": [
+        "geometry",
+        "header",
+        "messages",
+        "parameters",
+        "properties",
+        "times",
+        "type"
+      ],
+      "header": {
+        "title": "NASA/POWER Source Native Resolution Monthly and Annual",
+        "api": {
+          "version": "v2.10.0",
+          "name": "POWER Monthly and Annual API"
+        },
+        "sources": [
+          "MERRA2"
+        ],
+        "fill_value": -999.0,
+        "time_standard": "LST",
+        "start": "19910101",
+        "end": "20241231"
+      },
+      "parametersMetadata": {
+        "T2M": {
+          "units": "C",
+          "longname": "Temperature at 2 Meters"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.85,
+          21.03,
+          87.73
+        ]
+      },
+      "monthlyKeysCount": 408,
+      "firstMonth": "199101",
+      "lastMonth": "202412",
+      "nonMonthlyKeys": [
+        "199113",
+        "199213",
+        "199313",
+        "199413",
+        "199513",
+        "199613",
+        "199713",
+        "199813",
+        "199913",
+        "200013",
+        "200113",
+        "200213",
+        "200313",
+        "200413",
+        "200513",
+        "200613",
+        "200713",
+        "200813",
+        "200913",
+        "201013"
+      ],
+      "candidateMissingValuesToInvestigate": [],
+      "rawSha256": "975769082b5aaabeb625c5055acdfce531eb408117f0378c1f4ad357064b4dee",
+      "observedFillValues": []
+    },
+    {
+      "site": "can-tho",
+      "requestedCoordinates": {
+        "latitude": 10.03,
+        "longitude": 105.78
+      },
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M&community=SB&longitude=105.78&latitude=10.03&format=JSON&start=1991&end=2024",
+      "accessedAt": "2026-11-14T18:00:50.472501+00:00",
+      "status": "RAW_RECEIVED_NOT_VALIDATED",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "topLevelKeys": [
+        "geometry",
+        "header",
+        "messages",
+        "parameters",
+        "properties",
+        "times",
+        "type"
+      ],
+      "header": {
+        "title": "NASA/POWER Source Native Resolution Monthly and Annual",
+        "api": {
+          "version": "v2.10.0",
+          "name": "POWER Monthly and Annual API"
+        },
+        "sources": [
+          "MERRA2"
+        ],
+        "fill_value": -999.0,
+        "time_standard": "LST",
+        "start": "19910101",
+        "end": "20241231"
+      },
+      "parametersMetadata": {
+        "T2M": {
+          "units": "C",
+          "longname": "Temperature at 2 Meters"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.78,
+          10.03,
+          1.91
+        ]
+      },
+      "monthlyKeysCount": 408,
+      "firstMonth": "199101",
+      "lastMonth": "202412",
+      "nonMonthlyKeys": [
+        "199113",
+        "199213",
+        "199313",
+        "199413",
+        "199513",
+        "199613",
+        "199713",
+        "199813",
+        "199913",
+        "200013",
+        "200113",
+        "200213",
+        "200313",
+        "200413",
+        "200513",
+        "200613",
+        "200713",
+        "200813",
+        "200913",
+        "201013"
+      ],
+      "candidateMissingValuesToInvestigate": [],
+      "rawSha256": "f7ba8fc43669be37f4e91cae1b7bb95adf53d8c090972f328d5c805f70c1367c",
+      "observedFillValues": []
+    }
+  ],
+  "captureEvidence": {
+    "workflowRunId": 43624190717,
+    "workflowRunUrl": "https://github.com/HiyoriVn/TrendEarth-AI/actions/runs/43624190717",
+    "headBranch": "feat/mvp-data",
+    "headSha": "1c0f949442fb81f1f3b2e32a07a4828f1205133c",
+    "jobId": 132536284511,
+    "jobConclusion": "success",
+    "artifactId": 14124962848,
+    "artifactName": "nasa-power-probe-evidence",
+    "artifactSha256": "89e150cca166a591a3f3376dec951ad2ccbc2b83c78057e9114554370698d4b9",
+    "artifactUrl": "https://github.com/HiyoriVn/TrendEarth-AI/actions/runs/43624190717/artifacts/14124962848",
+    "note": "Workflow captured raw HTTP 200 JSON and uploaded it; it did not validate or process climate statistics."
+  }
+}
