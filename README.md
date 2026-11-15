@@ -45,3 +45,47 @@ Review `docs/01-SRS-DRAFT.md` and `docs/07-DECISIONS-RISKS.md`; answer only the 
 
 ## License
 Apache-2.0 (see `LICENSE`). Do not copy NASA branding, partner logos or third-party images without checking permissions. NASA data provenance and source attribution are mandatory.
+
+## Run the integrated MVP
+
+Use Node.js 22+ and Python 3.12. From repository root:
+
+```sh
+python -m pip install -r pipeline/requirements.txt
+python -m unittest discover -s tests -v
+npm --prefix frontend ci
+npm --prefix frontend test
+npm --prefix frontend run dev
+```
+
+Open the local URL printed by Vite. For a production check:
+`npm --prefix frontend run build`, then `npm --prefix frontend run preview`.
+Build synchronizes validated canonical JSON into public/data; output is
+`frontend/dist`, including `data/hanoi.json` and `data/can-tho.json`.
+No NASA network request occurs in the browser. See `pipeline/README.md` for
+raw provenance, offline regeneration and the fixed scientific contract.
+
+### Deployment settings (manual approval required)
+
+Cloudflare Pages: repository root directory `/`; build command
+`npm --prefix frontend ci && npm --prefix frontend run build`; output directory
+`frontend/dist`. Node version 22. No environment secrets required.
+
+Vercel: Root Directory `frontend`; framework Vite; install command `npm ci`;
+build command `npm run build`; Output Directory `dist`. Enable access to files
+outside the Root Directory because the build reads `../data/processed/`.
+Alternatively use repository root with the Cloudflare command and output path.
+Review the preview for both locations before approving production publication.
+No deployment is performed by the CI workflows.
+
+### 60-second demo
+
+0–15s: Explain that TrendEarth AI helps students inspect NASA POWER temperature
+series; AI is the project name, with no trained model in this MVP.
+15–30s: Select Hanoi, point out annual observations, dashed OLS fit, rate per
+decade and exploratory p-value. Switch to Can Tho; all panels update together.
+30–45s: Open methods and source details; show the exact NASA URL, requested and
+returned geometry, 34 complete years and day-weighted aggregation.
+45–60s: Explain the conservative 30-year reporting policy and limitations:
+classical p-values do not correct autocorrelation; one model point does not
+establish citywide trends or causation. Close with reproducible static delivery.

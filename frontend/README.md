@@ -1,3 +1,11 @@
-# Frontend — planned
+# TrendEarth AI dashboard
 
-Design gate: user flow and stable data contract must be approved first. Preferred stack React + Vite + Chart.js; responsive single-screen dashboard and clear statistical caveats. Do not generate fictional results.
+From repository root run `npm --prefix frontend ci`, then
+`npm --prefix frontend run dev`.
+
+`npm --prefix frontend test` checks the scientific JSON contract.
+`npm --prefix frontend run build` validates and copies the two canonical datasets
+from `data/processed/` before Vite builds `frontend/dist/`.
+
+See the root README for deployment settings and demo script. No live NASA API
+or backend is required at runtime. No deployment is authorized by this branch.

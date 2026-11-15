@@ -1,0 +1,34 @@
+name: Probe NASA POWER (no data claims)
+
+on:
+  push:
+    branches:
+      - feat/mvp-data
+    paths:
+      - 'scripts/probe_power.py'
+      - '.github/workflows/nasa-power-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe two sites and record actual NASA responses or exact failures
+        id: probe
+        run: python scripts/probe_power.py
+      - name: Upload raw response and diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nasa-power-probe-evidence
+          path: artifacts/nasa-power-probe/
+          retention-days: 7
+          if-no-files-found: warn
