@@ -89,3 +89,24 @@ returned geometry, 34 complete years and day-weighted aggregation.
 45–60s: Explain the conservative 30-year reporting policy and limitations:
 classical p-values do not correct autocorrelation; one model point does not
 establish citywide trends or causation. Close with reproducible static delivery.
+
+
+## Interactive Climate Explorer (Issue #12)
+
+Choose Single location or Compare Hanoi vs Can Tho, then Annual mean,
+Temperature anomaly, or Trailing 5-year mean. Anomalies require all 30 complete
+annual values in 1991–2020 for each site; no partial baseline is substituted.
+Trailing windows include the displayed year and four preceding contiguous
+complete years. These displays are descriptive only; OLS cards always refer to
+original full-window annual means and fits are drawn only in annual mode.
+
+Hover/focus/click a chart point or select a year in the inspector. Comparison
+differences are Can Tho minus Hanoi for the same raw annual year. Download CSV
+exports original annual values, coverage/exclusion status, exact source URLs
+and access timestamps, regardless of chart display. Missing values remain empty.
+
+Browser interaction checks: `npm --prefix frontend run test:browser` after
+`npx --prefix frontend playwright install chromium` and the production build.
+For an installed Edge executable, set EDGE_PATH to its full path. Unit tests
+remain `npm --prefix frontend test`. Workers validation only (no deployment):
+`npx wrangler deploy --dry-run --outdir .tmp/workers-check` after the build.

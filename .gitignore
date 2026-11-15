@@ -15,3 +15,6 @@ __pycache__/
 .tmp/
 # Keep reviewed NASA sample datasets; do not commit huge raw downloads
 raw-data/
+
+frontend/test-results/
+frontend/playwright-report/

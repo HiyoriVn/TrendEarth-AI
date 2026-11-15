@@ -1,0 +1,3 @@
+data/raw/*-raw.json -text
+data/processed/*.json -text
+frontend/public/data/*.json -text
